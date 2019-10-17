@@ -2,6 +2,7 @@
 <div style="text-align: justify">
 The project designed for simplifying training process as much as possible. We have used SOTA tracking and object detection models
 for automatic labeling. </div>
+
 ### Environments
 1. Ubuntu 16.04/18.04
 2. python > = 3.6

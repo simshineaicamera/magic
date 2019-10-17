@@ -17,6 +17,7 @@ git-lfs clone https://github.com/simshineaicamera/magic.git
 cd magic
 ```
 *Note please use git-lfs, because yolov3 model is large, can't be downloaded without git-lfs*
+
 2. Install python package requirments:
 ```Shell
 python3.6 -m pip install -r requirments.txt

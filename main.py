@@ -21,28 +21,28 @@ from time import time, sleep
 import threading
 
 def create_labelmap(label):
-    
-    text = str(labelmap_text) + '\n   name: ' + '"'+label + '"' 
+
+    text = str(labelmap_text) + '\n   name: ' + '"'+label + '"'
     text = text + '\n   label: 1\n   display_name: "' + label + '"' +"\n}"
-    
+
     file = open(labelmap_path, 'w')
     file.write(text)
     file.close()
 
 def create_txt():
-        total_xml = os.listdir(xml_path)  
-        num=len(total_xml)  
+        total_xml = os.listdir(xml_path)
+        num=len(total_xml)
         list=range(num)
-        tr=int(num*train_percent)   
-        train=random.sample(list,tr)   
-        
-        for i  in list:  
-            name=total_xml[i][:-4]+'\n'  
-            if i in train:  
-                ftrain.write(name)  
-            else:  
-                ftest.write(name)    
-        ftrain.close()    
+        tr=int(num*train_percent)
+        train=random.sample(list,tr)
+
+        for i  in list:
+            name=total_xml[i][:-4]+'\n'
+            if i in train:
+                ftrain.write(name)
+            else:
+                ftest.write(name)
+        ftrain.close()
         ftest .close()
 def read_trainLog():
         """
@@ -52,7 +52,7 @@ def read_trainLog():
         # load all training data
         with open(LogPath) as f:
             data = f.readlines()
-            data = data[1:] # remove the first row (title) 
+            data = data[1:] # remove the first row (title)
             data_len = len(data)
         f.close()
         Iters = [0]
@@ -60,20 +60,20 @@ def read_trainLog():
 
         for row in range(data_len):
             data_row = data[row].split(' ') # splitted by ' '
-            while '' in data_row: 
+            while '' in data_row:
                 data_row.remove('')
             if ("Iteration" in data_row) and (len(data_row)==9):
                 tmp = data_row[5][:-1]
                 Iters.append(int(tmp))
-            
+
             if "class1:" in data_row:
-                Accuracy.append(float(data_row[-1]))        
-        return Iters, Accuracy 
+                Accuracy.append(float(data_row[-1]))
+        return Iters, Accuracy
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        
+
         MainWindow.resize(581, 226)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -160,7 +160,7 @@ class Ui_MainWindow(object):
         else:
             self.lineEdit.setPlaceholderText("")
             self.lineEdit.setEnabled(False)
-            
+
     def load_labels(self):
         label_file = open(label_path, 'r')
         labels = label_file.read().split('\n')
@@ -171,13 +171,13 @@ class Ui_MainWindow(object):
             self.comboBox.setItemText(i,labels[i-1])
         self.comboBox.addItem("")
         self.comboBox.setItemText(81, "Other")
-        
+
     def video2image(self,path):
         '''
         video to image convertor
         '''
-        self.label.setText("Uploading file....") 
-        print(path)       
+        self.label.setText("Uploading file....")
+        print(path)
         os.system(copy_command.format(path, video_path))
         if not os.path.exists(save_images):
             os.system('mkdir -p %s'%save_images)
@@ -201,10 +201,10 @@ class Ui_MainWindow(object):
                 image_name=video_name+'_%08d'%numOfImage+'.jpg'
                 image_path=os.path.join(save_images,image_name)
                 cv2.imwrite(image_path,frame)
-    
+
     def upload(self):
         '''
-        this functions is for uploading a video and extract 
+        this functions is for uploading a video and extract
         images into JPEGImages folder
         '''
         src = QFileDialog.getOpenFileName(None, "Open File")
@@ -219,14 +219,14 @@ class Ui_MainWindow(object):
                 self.label.setText("Please choose a video with longer duration...")
             else:
                 self.label.setText("Thanks! Your file is uploaded into server.")
-    
+
     def auto_label(self):
         '''
         automatic labeling images using tracking method or using trained model
         '''
         label = "NoName"
         index = self.comboBox.currentIndex()
-        
+
         if self.num_examples(jpg_path)>0:
             os.system(rm_cmd.format(jpg_path))
             os.system(rm_cmd.format(xml_path))
@@ -253,22 +253,22 @@ class Ui_MainWindow(object):
     #     full = self.num_examples(src_path)
     #     sleep(60)
     #     while True:
-    #         progress = 100*setProgress()/full 
+    #         progress = 100*setProgress()/full
     #         sleep(5)
     #         self.progressBar_2.setValue(progress)
     #         print("Hi")
     # def auto_label(self):
-    #     t1 = threading.Thread(target=self.auto_label_func) 
-    #     t2 = threading.Thread(target=self.auto_label_prog) 
-    #     # starting thread 1 
-    #     t1.start() 
-    #     # starting thread 2 
-    #    # t2.start() 
+    #     t1 = threading.Thread(target=self.auto_label_func)
+    #     t2 = threading.Thread(target=self.auto_label_prog)
+    #     # starting thread 1
+    #     t1.start()
+    #     # starting thread 2
+    #    # t2.start()
     #     #sleep(3)
-    #     # wait until thread 1 is completely executed 
-    #     t1.join() 
+    #     # wait until thread 1 is completely executed
+    #     t1.join()
     #    # sleep(1)
-    #     # wait until thread 2 is completely executed 
+    #     # wait until thread 2 is completely executed
     #     #t2.join()
     def say_bye(self, label):
         create_labelmap(label)
@@ -290,30 +290,32 @@ class Ui_MainWindow(object):
         msg.show()
     def create_n_start(self):
         #self.message("thread1")
+        self.pushButton.setText('Stop Training')
         print("Data processing.")
         self.progressBar.setValue(1)
         create_txt()
         os.system(create_lmdb)
         print("Training started")
         os.system(start_train)
-        
+
 
     def update_process(self):
-        self.label_3.setText(progres_text.format(1, 0))
+        self.progressBar.setValue(15)
+        self.pushButton.setText('Stop Training')
         sleep(20)
         de = 0
         #self.message("thread2 is started")
         while True:
             sleep(3)
             iters, acc = read_trainLog()
-            
+
             if len(acc)>1:
                 de = acc[-1]
             epoch = int(iters[-1]/1000)+1
             self.label_3.setText(progres_text.format(epoch, de))
             progress = 1+ (iters[-1]%1000)/10
             self.progressBar.setValue(progress)
-            
+
 
 
 
@@ -321,19 +323,19 @@ class Ui_MainWindow(object):
         #self.create_n_start()
         #text = self.
         #self.pushButton.setText("Stop training")
-        
-        t1 = threading.Thread(target=self.create_n_start) 
-        t2 = threading.Thread(target=self.update_process) 
-        # starting thread 1 
-        t1.start() 
-        # starting thread 2 
-        t2.start() 
+
+        t1 = threading.Thread(target=self.create_n_start)
+        t2 = threading.Thread(target=self.update_process)
+        # starting thread 1
+        t1.start()
+        # starting thread 2
+        t2.start()
         sleep(3)
-        # wait until thread 1 is completely executed 
-        t1.join() 
+        # wait until thread 1 is completely executed
+        t1.join()
         sleep(1)
-        # wait until thread 2 is completely executed 
-        t2.join() 
+        # wait until thread 2 is completely executed
+        t2.join()
 
 
 if __name__ == "__main__":

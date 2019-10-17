@@ -264,17 +264,22 @@ def auto_label_yolov3(label, index):
 
 def stylize(img_name, device, vgg, decoder, content_tf, style_tf):
     content_path = os.path.join(jpg_path, img_name)
+    content_path = Path(content_path)
     content_img = Image.open(content_path).convert('RGB')
     styles = os.listdir(style_dir)
     # content_tf = input_transform(0, False)
     # style_tf = input_transform(0, False)
-    for style_path in styles:
+    #k = 0 
+    for k in range(num_styles):
+        tmp = random.randint(0, 99)
+        style_path = styles[tmp] 
         try:
-            style_img = Image.open(style_path).convert('RGB')
+            style_img = Image.open(os.path.join(style_dir, style_path)).convert('RGB')
         except OSError as e:
             print('Skipping stylization of %s with %s due to error below' %(content_path, style_path))
             print(e)
             continue
+        
         content = content_tf(content_img)
         style = style_tf(style_img)
         style = style.to(device).unsqueeze(0)
@@ -294,7 +299,7 @@ def stylize(img_name, device, vgg, decoder, content_tf, style_tf):
         #     out_dir.mkdir(parents=True)
 
         content_name = content_path.stem
-        style_name = style_path.stem
+        style_name = style_path.split('.')[0]
         out_filename = content_name + '-stylized-' + style_name + content_path.suffix
         output_name = os.path.join(jpg_path, out_filename)
 
@@ -305,6 +310,9 @@ def stylize(img_name, device, vgg, decoder, content_tf, style_tf):
         xml_name_new = os.path.join(xml_path, xml_name_new)
         os.system(copy_command.format(xml_name_old, xml_name_new))
         style_img.close()
+        k+=1
+        #if k>=num_styles:
+         #   break
     content_img.close()
 
 

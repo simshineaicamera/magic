@@ -2,7 +2,7 @@
 # SiamMask
 # Licensed under The MIT License
 # Written by Qiang Wang (wangqiang2015 at ia.ac.cn)
-# Modified by Inomjon for auto labeling images 
+# Modified by Inomjon for auto labeling images
 # --------------------------------------------------------
 
 from PIL import Image
@@ -58,7 +58,7 @@ def tracking(label):
     if args.resume:
         assert isfile(args.resume), 'Please download {} first.'.format(args.resume)
         siammask = load_pretrain(siammask, args.resume)
-   
+
     #siammask, device, cfg = init_tracking_model()
     siammask.eval().to(device)
 
@@ -90,17 +90,17 @@ def tracking(label):
             #labelWin.showWin(labelWin)
             state = siamese_init(im, target_pos, target_sz, siammask, cfg['hp'], device=device)  # init tracker
             init_state = state
-            
+
         elif f > 0:  # tracking
             state = siamese_track(state, im, mask_enable=True, refine_enable=True, device=device)  # track
             location = state['ploygon'].flatten()
             score = state["score"]
                 #mask = state['mask'] > state['p'].seg_thr
                 #print(location)
-            
+
             if score > conf:
                 conf = 0.99
-                
+
                 if len(location)==8:
                     xlist = []
                     ylist = []
@@ -124,9 +124,9 @@ def tracking(label):
                     width = im.shape[1]
                     depth=im.shape[2]
                     auto_label(im, box, name, label, height, width, depth)
-                    
+
                     data_generate(im, box, name, label)
-                    stylize(name, device,vgg, decoder, content_tf, style_tf)
+                    #stylize(name, device,vgg, decoder, content_tf, style_tf)
                     cv2.polylines(im, [np.int0(location).reshape((-1, 1, 2))], True, (0, 255, 0), 3)
                     #getProgress(f)
 
